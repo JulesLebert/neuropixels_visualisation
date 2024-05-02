@@ -25,7 +25,7 @@ def spikesorting_pipeline(recording, output_folder, sorter='kilosort4'):
     sorting = si.run_sorter(
         sorter_name=sorter, 
         recording=recording, 
-        output_folder=output_folder / f'{sorter}_output',
+        output_folder = working_directory / f'{sorter}_output',
         verbose=True,
         )
     
