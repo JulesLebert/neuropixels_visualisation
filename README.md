@@ -1,6 +1,6 @@
 # Neuropixels visualisation
 
-Some scripts to got from raw data to psths in the Speech task
+Some scripts to go from raw data to psths in the Speech task
 
 ## Installation
 
@@ -25,7 +25,7 @@ The current script plot psths for all units, but feel free to add some filter to
 
 To filter the spikesorting output:
 
-    * either use [phy](https://github.com/cortex-lab/phy) (the phy manual clustering results will be loaded in the neo object)
-    * Or use filters on your quality metrics of choice (all saved in the spiketrains object from neo)
+- either use [phy](https://github.com/cortex-lab/phy) (the phy manual clustering results will be loaded in the neo object)
+- Or use filters on your quality metrics of choice (all saved in the spiketrains object from neo)
 
-More information about quality metrics on [spikeinterface](https://spikeinterface.readthedocs.io/en/latest/modules/qualitymetrics.html) doc and this [Allen institute doc](https://allensdk.readthedocs.io/en/latest/_static/examples/nb/ecephys_quality_metrics.html).
+There is more information about quality metrics in the [spikeinterface](https://spikeinterface.readthedocs.io/en/latest/modules/qualitymetrics.html) document and this [Allen institute doc](https://allensdk.readthedocs.io/en/latest/_static/examples/nb/ecephys_quality_metrics.html) document.
