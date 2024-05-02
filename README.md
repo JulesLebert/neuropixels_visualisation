@@ -1,6 +1,6 @@
 # Neuropixels visualisation
 
-Some scripts to got from raw data to psths in the Speech task
+Some scripts to go from raw data to psths in the Speech task
 
 ## Installation
 
