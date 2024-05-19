@@ -12,8 +12,8 @@ def spikeglx_preprocessing(recording):
     return recording
 
 
-def spikesorting_pipeline(recording, output_folder, sorter='kilosort4'):
-    working_directory = Path(output_folder) / 'tempDir'
+def spikesorting_pipeline(recording, working_directory, sorter='kilosort4'):
+    # working_directory = Path(output_folder) / 'tempDir' / recording.name
 
     if (working_directory / 'binary.json').exists():
         recording = si.load_extractor(working_directory)
