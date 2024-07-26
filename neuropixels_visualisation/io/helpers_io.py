@@ -480,7 +480,7 @@ def get_npix_sync(dp, output_binary=False, unit='seconds', sync_trial_chan=[5], 
             binary=np.load(sync_dp/(sync_fname+'.npz'))
             binary=binary[dir(binary.f)[0]].astype(np.int8)
 
-    else: os.mkdir(sync_dp)
+    # else: os.mkdir(sync_dp)
 
     if fname=='':
         # fname = '{}t0.nidq.bin'.format(dp.name[:-5])
@@ -498,7 +498,7 @@ def get_npix_sync(dp, output_binary=False, unit='seconds', sync_trial_chan=[5], 
         print('Unpacking {}...'.format(fname))
         binary = unpackbits(syncdat.flatten(),16).astype(np.int8)
         sync_fname = fname[:-4]+'_sync'
-        np.savez_compressed(sync_dp/(sync_fname+'.npz'), binary)   
+        # np.savez_compressed(sync_dp/(sync_fname+'.npz'), binary)   
 
     if output_binary:
         return binary
@@ -512,12 +512,12 @@ def get_npix_sync(dp, output_binary=False, unit='seconds', sync_trial_chan=[5], 
         ons = sync_idx_onset[0][
             sync_idx_onset[1] == ichan]
         onsets[ichan] = ons
-        np.save(Path(sync_dp, sync_fname+'{}on_samples.npy'.format(ichan)), ons)
+        # np.save(Path(sync_dp, sync_fname+'{}on_samples.npy'.format(ichan)), ons)
     for ichan in sync_trial_chan: #np.unique(sync_idx_offset[1]):
         ofs = sync_idx_offset[0][
             sync_idx_offset[1] == ichan]
         offsets[ichan] = ofs
-        np.save(Path(sync_dp, sync_fname+'{}of_samples.npy'.format(ichan)), ofs)
+        # np.save(Path(sync_dp, sync_fname+'{}of_samples.npy'.format(ichan)), ofs)
 
     onsets={ok:ov/srate for ok, ov in onsets.items()}
     offsets={ok:ov/srate for ok, ov in offsets.items()}

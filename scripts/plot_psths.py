@@ -15,12 +15,13 @@ def analyse_single_session(session_path, save_dir):
 def main():
     save_dir = Path('/mnt/a/NeuropixelData/output_jeffrey/figures')
 
-    data_path = Path('/mnt/a/NeuropixelData/output_jeffrey/spikesorted')
-    ferret = 'F1903_Trifle'
-    session_name = '021122_trifle_pm3_g0'
+    data_path = Path('/mnt/a/NeuropixelData/spikesorted_single/spikesorted/')
+    ferret = 'F2302_Challah'
+    session_name = '13052023_AM_Challah_g0'
+    stream_id = 'imec1.ap'
     sorter = 'kilosort'
 
-    dp = data_path / ferret / session_name / sorter
+    dp = data_path / ferret / session_name / stream_id / sorter
 
     analyse_single_session(dp, save_dir=save_dir)
 

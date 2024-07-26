@@ -97,6 +97,8 @@ class PhyNpxlRawIO(PhyRawIO):
         
         phy_folder = Path(self.dirname)
         self._name = phy_folder.parents._parts[-3]
+        if self._name.startswith('imec'):
+            self._name = phy_folder.parents._parts[-4]
 
         ferret = [parent.name for parent in phy_folder.parents if parent.name.startswith('F')]
         assert len(ferret) == 1, \
@@ -146,7 +148,7 @@ class PhyNpxlRawIO(PhyRawIO):
             # meta['highpass']['fileCreateTime_original'],
             meta['fileCreateTime'],
             fileInfo,
-            threshold=2,
+            threshold=5,
             )
 
         seg_ann['bhv_file'] = behaviouralSession
