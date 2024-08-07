@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["JulesLebert <lebert.jules@gmail.com>"]
 readme = "README.md"
+packages = [{include = "neuropixels_visualization"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

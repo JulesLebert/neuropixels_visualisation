@@ -6,19 +6,34 @@ def spikeglx_preprocessing(recording):
     recording = si.bandpass_filter(recording, freq_min=300, freq_max=6000)
     bad_channel_ids, channel_labels = si.detect_bad_channels(recording)
     recording = recording.remove_channels(bad_channel_ids)
-    recording = si.phase_shift(recording)
+    recording = si.phase_shift(recording) #mandatory for NP recordings because the channels are not sampled at the same time. make
     recording = si.common_reference(recording, reference='global', operator='median')
 
     return recording
 
+def spikeglx_preprocessing_preconcatenation(recording):
+    recording = si.bandpass_filter(recording, freq_min=300, freq_max=6000)
+    recording = si.phase_shift(recording) #mandatory for NP recordings because the channels are not sampled at the same time. make
+    recording = si.common_reference(recording, reference='global', operator='median')
 
-def spikesorting_pipeline(recording, output_folder, sorter='kilosort4'):
+    return recording
+
+def spikeglx_preprocessing_postconcatenation(recording):
+    bad_channel_ids, channel_labels = si.detect_bad_channels(recording)
+    recording = recording.remove_channels(bad_channel_ids)
+
+    return recording
+
+def spikesorting_pipeline(recording, output_folder, sorter='kilosort4',concatenated=False):
     working_directory = Path(output_folder) / 'tempDir'
 
     if (working_directory / 'binary.json').exists():
         recording = si.load_extractor(working_directory)
     else:
-        recording = spikeglx_preprocessing(recording)
+        if not(concatenated):
+            recording = spikeglx_preprocessing(recording)
+        else:
+            recording = spikeglx_preprocessing_postconcatenation(recording)
         job_kwargs = dict(n_jobs=-1, chunk_duration='1s', progress_bar=True)
         recording = recording.save(folder = working_directory, format='binary', **job_kwargs)
 

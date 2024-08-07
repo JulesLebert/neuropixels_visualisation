@@ -1,6 +1,6 @@
 from pathlib import Path
 
-behaviouralDataPath = Path('/home/jules/Dropbox/Data')
-neuropixelDataPath = Path('/mnt/a/NeuropixelData/raw')
+behaviouralDataPath = Path('Y:/Data/Behaviour/Ferret')
+neuropixelDataPath = Path('Z:/Data/Neuropixels')
 
 bhv_fs = 24414.062500
