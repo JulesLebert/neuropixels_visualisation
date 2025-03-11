@@ -3,7 +3,7 @@ from neo.io.basefromrawio import BaseFromRaw
 from .phynpxlrawio import PhyNpxlRawIO
 
 
-class PhyNpxlIO(PhyNpxlRawIO, BaseFromRaw):
+class PhyNpxlIO(PhyNpxlRawIO, BaseFromRaw): # some kind of object that does IO for phy.
     name = 'Phy IO'
     description = "Phy IO"
     mode = 'dir'

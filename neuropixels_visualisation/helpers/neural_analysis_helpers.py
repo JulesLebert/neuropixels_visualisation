@@ -7,8 +7,65 @@ import spikeinterface.full as si
 from tqdm import tqdm
 
 from neuropixels_visualisation.helpers.util import simple_xy_axes, set_font_axes
+from neuropixels_visualisation.config import neuropixelDataPath
 from ..io.phynpxlio import PhyNpxlIO
 from ..io.phywarpio import PhyWarpIO
+from instruments.io.phyconcatrecio import PhyConcatRecIO
+
+from instruments.helpers.extract_helpers import load_bhv_data
+
+
+@dataclass
+class concatenatedNeuralData:  # Reportedly this is the class Jules uses to readily link the neural data with behavior.
+    ### In "NeuralDataset" the only arguments are dp and datatype.
+
+    dp: str # path to spikesorted wrap data in phy format (probably, it is this in the non-concatenated object)
+    currNeuralDataPath: str = neuropixelDataPath # If you ever use warps you can import these.
+    datatype: str = 'warp'  # Either 'neuropixels' or 'warp'
+    overwrite_pkl: bool = False  # overwrite something?
+    sync_around_pulses: bool = True  # this is the thing where we use the aux input to sync
+    window_around_pulses: float = -2
+
+    def load(self):
+        assert self.datatype in ['neuropixels', 'warp'], 'Unknown datatype'
+        print("Loading data from:", self.dp)
+        phy_folder = Path(self.dp) # in NeuralData, this is just self.dp
+        self.evtypes = {'Trial Start': 'startTrialLick', 'Target Time': 'absoluteTargTimes',
+                        'Release Time': 'absoluteRealLickRelease'}  # types of events that will be linked.
+
+        if (phy_folder / 'blocks.pkl').exists() and not self.overwrite_pkl: # Looks like this will load old files if you don't ask it to overwrite them.
+            with open(phy_folder / 'blocks.pkl', 'rb') as f:
+                self.blocks = pickle.load(f)
+        else:
+            self.reader = PhyConcatRecIO(dirname=phy_folder,
+                                         currNeuralDataPath=self.currNeuralDataPath,
+                                         datatype=self.datatype,
+                                         sync_around_pulses=self.sync_around_pulses,
+                                         window_around_pulses=self.window_around_pulses)
+            self.blocks = self.reader.read()
+
+            for seg in self.blocks[0].segments:
+                if seg.annotations['bhv_file'] is not None:
+                    seg.df_bhv = load_bhv_data(
+                        seg.annotations['bhv_file'])
+
+                else:
+                    seg.df_bhv = None
+
+            #with open(phy_folder / 'blocks.pkl', 'wb') as f: ### commenting out the pickle stuff so I can bypass it.
+            #    print('save pickle blocks file in:', phy_folder / 'blocks.pkl')
+            #    pickle.dump(self.blocks, f)
+
+    def get_cluster_ids(self, blocks, group=['good', 'mua']):
+        if isinstance(group, list):
+            cluster_ids = [st.annotations['cluster_id'] for st in blocks[0].segments[0].spiketrains
+                           if st.annotations['group'] in group]
+            return cluster_ids
+
+        cluster_ids = [st.annotations['cluster_id'] for st in blocks[0].segments[0].spiketrains
+                       if st.annotations['group'] == group]
+        return cluster_ids
+
 
 @dataclass
 class NeuralDataset:
@@ -23,11 +80,11 @@ class NeuralDataset:
         self.dp = Path(self.dp)
 
         self.evtypes = {'Trial Start': 'startTrialLick', 'Target Time': 'absoluteTargTimes',
-            'Release Time': 'absoluteRealLickRelease'}
-            
+            'Release Time': 'absoluteRealLickRelease'} #hmm... Important context. These are the "ev" to which things will be aligned later.
+            ### more notes on above... I need to add an ev type for splitting specific tokens. Or maybe I don't want to use "ev type" for that...
         if self.datatype =='neuropixel':
             phy_folder = self.dp
-            self.reader = PhyNpxlIO(dirname=phy_folder)
+            self.reader = PhyNpxlIO(dirname=phy_folder) ### seems like this might read the phy file?
         elif self.datatype == 'warp':
             phy_folder = self.dp / 'phy'
             self.reader = PhyWarpIO(dirname = phy_folder)
@@ -46,7 +103,7 @@ class NeuralDataset:
         #     self.quality_metrics.cluster_id = self.quality_metrics.cluster_id.astype('int') - 1
 
 
-    def get_rec_objet(self):
+    def get_rec_objet(self): # seems like this reads the spikeglx information based on the recording path which is stored in the object.
         if self.dataype == 'neuropixel':
             rec_path = self.dp.parents[2]
             recording = si.read_spikeglx(rec_path, stream_id='imec0.ap')
@@ -58,7 +115,7 @@ class NeuralDataset:
         self.recording = recording
         return recording
 
-    def get_sorting_object(self):
+    def get_sorting_object(self): # gets phy output I guess.
             sorting = si.read_phy(self.dp)
             self.sorting = sorting
             return sorting
@@ -70,7 +127,7 @@ class NeuralDataset:
             filter_trials = {},
             window=[-1,2],
             # fr_threshold = 1
-            ):
+            ): # "ev" probably means the sound signal or something.
 
         aligned_spikes = []
         for seg in self.blocks[0].segments:
@@ -102,7 +159,7 @@ class NeuralDataset:
             saveDir,
             title='summary_pdf',
             window=[-0.5, 1],
-            binsize = 0.02):
+            binsize = 0.02): # a plotting function...
             
         block = self.blocks[0]
 
@@ -154,7 +211,7 @@ class NeuralDataset:
                         cluster_id, 
                         events_args,
                         window=[-0.5, 1],
-                        binsize = 0.02):
+                        binsize = 0.02): ### This is either just the plotting function or it also does the analysis. I'll let you know what I find out.
         
         colors = {'Trial Start': 'red',
                   'Target Time': 'green',
@@ -167,7 +224,7 @@ class NeuralDataset:
             JKL
             MNO
             PQR
-        """
+        """ ### Seems like this might be a way of subplotting, which excites me.
 
             # STT
             # STT

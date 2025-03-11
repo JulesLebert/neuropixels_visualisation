@@ -92,11 +92,11 @@ class PhyNpxlRawIO(PhyRawIO):
     def _source_name(self):
         return self.dirname
 
-    def _parse_header(self):
+    def _parse_header(self): # this function is heavily non-robust. It depends on aspects being in specific positions.
         PhyRawIO._parse_header(self)
         
         phy_folder = Path(self.dirname)
-        self._name = phy_folder.parents._parts[-3]
+        self._name = phy_folder.parents._parts[-4] # this was once -3. It led to the "name" being imec0.ap, which is incorrect, and moreover the code seems to have been written to not expect it. I need to rewrite it.
 
         ferret = [parent.name for parent in phy_folder.parents if parent.name.startswith('F')]
         assert len(ferret) == 1, \
@@ -146,7 +146,7 @@ class PhyNpxlRawIO(PhyRawIO):
             # meta['highpass']['fileCreateTime_original'],
             meta['fileCreateTime'],
             fileInfo,
-            threshold=2,
+            threshold=3,
             )
 
         seg_ann['bhv_file'] = behaviouralSession

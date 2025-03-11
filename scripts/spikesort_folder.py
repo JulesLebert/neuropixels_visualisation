@@ -2,7 +2,8 @@ from pathlib import Path
 # import spikeinterface.extractors as se
 import spikeinterface.full as si
 
-from neuropixels_visualisation.spikesorting import spikesorting_pipeline, spikesorting_postprocessing
+from neuropixels_visualisation.spikesorting import spikesorting_pipeline, spikesorting_postprocessing, spikeglx_preprocessing
+
 
 def main():
     session_path = Path('Z:/Data/Neuropixels/F2302_Challah/') #path to where all relevant sessions are stored
@@ -18,6 +19,7 @@ def main():
 
         for stream_id in  ['imec0.ap', 'imec1.ap']:
             recording = si.read_spikeglx(dp, stream_id = stream_id)
+            recording = spikeglx_preprocessing(recording, 1)
             try:
                 sorting = spikesorting_pipeline(
                     recording, 
